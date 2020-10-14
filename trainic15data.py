@@ -22,16 +22,17 @@ from math import exp
 from data_loader import ICDAR2015, Synth80k, ICDAR2013
 
 ###import file#######
-from augmentation import random_rot, crop_img_bboxes
-from gaussianmap import gaussion_transform, four_point_transform
-from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
+# from augmentation import random_rot, crop_img_bboxes
+# from gaussianmap import gaussion_transform, four_point_transform
+# from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
 from mseloss import Maploss
 
 
 
 from collections import OrderedDict
 from eval.script import getresult
-
+from eval.script import evaluate_method           #!added by chen
+from eval.script import default_evaluation_params
 
 
 from PIL import Image
@@ -101,41 +102,41 @@ def adjust_learning_rate(optimizer, gamma, step):
 
 if __name__ == '__main__':
 
-    dataloader = Synth80k('/data/CRAFT-pytorch/syntext/SynthText/SynthText', target_size = 768)
-    train_loader = torch.utils.data.DataLoader(
-        dataloader,
-        batch_size=2,
-        shuffle=True,
-        num_workers=0,
-        drop_last=True,
-        pin_memory=True)
-    batch_syn = iter(train_loader)
-    
+    # dataloader = Synth80k('/data/CRAFT-pytorch/syntext/SynthText/SynthText', target_size = 768)
+    # train_loader = torch.utils.data.DataLoader(
+    #     dataloader,
+    #     batch_size=2,
+    #     shuffle=True,
+    #     num_workers=0,
+    #     drop_last=True,
+    #     pin_memory=True)
+    # batch_syn = iter(train_loader)
+
     net = CRAFT()
 
-    net.load_state_dict(copyStateDict(torch.load('/data/CRAFT-pytorch/1-7.pth')))
-    
+    net.load_state_dict(copyStateDict(torch.load('CRAFT_8011.pth')))
+
     net = net.cuda()
 
 
 
-    net = torch.nn.DataParallel(net,device_ids=[0,1,2,3]).cuda()
+    net = torch.nn.DataParallel(net,device_ids=[0, 1]).cuda()
+    #net = torch.nn.DataParallel(net,device_ids=[1]).cuda()
     cudnn.benchmark = True
     net.train()
-    realdata = ICDAR2015(net, '/data/CRAFT-pytorch/icdar2015', target_size=768)
+    realdata = ICDAR2015(net, 'icdar2015', target_size=768)
     real_data_loader = torch.utils.data.DataLoader(
         realdata,
-        batch_size=10,
+        batch_size=4,    #!original_batch = 10
         shuffle=True,
         num_workers=0,
         drop_last=True,
-        pin_memory=True)
+        pin_memory=False)
 
 
     optimizer = optim.Adam(net.parameters(), lr=args.lr, weight_decay=args.weight_decay)
     criterion = Maploss()
-    #criterion = torch.nn.MSELoss(reduce=True, size_average=True)
-    
+    # criterion = torch.nn.MSELoss(reduce=True, size_average=True)
 
 
     step_index = 0
@@ -144,7 +145,7 @@ if __name__ == '__main__':
     loss_time = 0
     loss_value = 0
     compare_loss = 1
-    for epoch in range(1000):
+    for epoch in range(10):
         train_time_st = time.time()
         loss_value = 0
         if epoch % 50 == 0 and epoch != 0:
@@ -154,11 +155,15 @@ if __name__ == '__main__':
         st = time.time()
         for index, (real_images, real_gh_label, real_gah_label, real_mask, _) in enumerate(real_data_loader):
             #real_images, real_gh_label, real_gah_label, real_mask = next(batch_real)
-            syn_images, syn_gh_label, syn_gah_label, syn_mask, __ = next(batch_syn)
-            images = torch.cat((syn_images,real_images), 0)
-            gh_label = torch.cat((syn_gh_label, real_gh_label), 0)
-            gah_label = torch.cat((syn_gah_label, real_gah_label), 0)
-            mask = torch.cat((syn_mask, real_mask), 0)
+            # syn_images, syn_gh_label, syn_gah_label, syn_mask, __ = next(batch_syn)
+            # images = torch.cat((syn_images,real_images), 0)
+            # gh_label = torch.cat((syn_gh_label, real_gh_label), 0)
+            # gah_label = torch.cat((syn_gah_label, real_gah_label), 0)
+            # mask = torch.cat((syn_mask, real_mask), 0)
+            images = real_images
+            gh_label = real_gh_label
+            gah_label = real_gah_label
+            mask = real_mask
             #affinity_mask = torch.cat((syn_mask, real_affinity_mask), 0)
 
 
@@ -173,10 +178,10 @@ if __name__ == '__main__':
             # affinity_mask = Variable(affinity_mask).cuda()
 
             out, _ = net(images)
-
+            #print('the out shape=', out.shape)                       #!print out
             optimizer.zero_grad()
 
-            out1 = out[:, :, :, 0].cuda()
+            out1 = out[:, :, :, 0].cuda() #!modified: change gpu
             out2 = out[:, :, :, 1].cuda()
             loss = criterion(gh_label, gah_label, out1, out2, mask)
 
@@ -197,11 +202,13 @@ if __name__ == '__main__':
 
         print('Saving state, iter:', epoch)
         torch.save(net.module.state_dict(),
-                   '/data/CRAFT-pytorch/real_weights/CRAFT_clr_' + repr(epoch) + '.pth')
-        test('/data/CRAFT-pytorch/real_weights/CRAFT_clr_' + repr(epoch) + '.pth')
+                   './real_weights_false/CRAFT_clr_' + repr(epoch) + '.pth', _use_new_zipfile_serialization = False)   #! modified saving directory
+        test('./real_weights_false/CRAFT_clr_' + repr(epoch) + '.pth')         #! modified saving directory
         #test('/data/CRAFT-pytorch/craft_mlt_25k.pth')
         getresult()
-        
+        evaluationParams = default_evaluation_params() 
+        evaluation = evaluate_method('./eval/gt.zip','./eval/submit.zip', evaluationParams)   #!added by chen: get precision  gtFilePath, submFilePath, evaluationParams
+        print('Method metrix: ',evaluation['method'])                                         #!added by chen: print out result   
 
 
 

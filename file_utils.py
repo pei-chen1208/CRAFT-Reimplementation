@@ -30,7 +30,7 @@ def list_files(in_path):
     # gt_files.sort()
     return img_files, mask_files, gt_files
 
-def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=None):
+def saveResult(img_file, img, boxes, dirname='./result2/', verticals=None, texts=None):
         """ save text detection result one by one
         Args:
             img_file (str): image file name
@@ -46,8 +46,9 @@ def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=
         filename, file_ext = os.path.splitext(os.path.basename(img_file))
 
         # result directory
-        res_file = dirname + "res_" + filename + '.txt'
-        res_img_file = dirname + "res_" + filename + '.jpg'
+        res_file = dirname + "/res_" + filename + '.txt'
+        res_img_file = dirname + "/res_" + filename + '.jpg'
+        gt_file = "./test/real_gt/gt_" + filename + '.txt'
 
         if not os.path.isdir(dirname):
             os.mkdir(dirname)
@@ -56,12 +57,20 @@ def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=
             for i, box in enumerate(boxes):
                 poly = np.array(box).astype(np.int32).reshape((-1))
                 strResult = ','.join([str(p) for p in poly]) + '\r\n'
-                # poly = np.array(box).astype(np.int32)
-                # min_x = np.min(poly[:,0])
-                # max_x = np.max(poly[:,0])
-                # min_y = np.min(poly[:,1])
-                # max_y = np.max(poly[:,1])
-                # strResult = ','.join([str(min_x), str(min_y), str(max_x), str(max_y)]) + '\r\n'
+                poly = np.array(box).astype(np.int32)          #! unlock the comment by pei
+                min_x = np.min(poly[:,0])                      #! ..
+                max_x = np.max(poly[:,0])                      #! ..
+                min_y = np.min(poly[:,1])                      #! ..
+                max_y = np.max(poly[:,1])                      #! ..
+                ####################  added by pei/2020/08/31
+                start_point = (min_x, min_y)
+                end_point = (max_x, max_y)
+                color = (255, 233, 50)
+                thickness = 2
+                img = cv2.rectangle(img, start_point, end_point, color, thickness)
+                ####################
+                #strResult = ','.join([str(min_x), str(min_y), str(max_x), str(max_y)]) + '\r\n'  #! ..
+                strResult = ','.join([str(min_x), str(min_y), str(max_x), str(min_y), str(max_x), str(max_y), str(min_x), str(max_y)]) + '\r\n'  #! added by pei/2020/08/31
                 f.write(strResult)
 
         #         poly = poly.reshape(-1, 2)
@@ -77,6 +86,14 @@ def saveResult(img_file, img, boxes, dirname='./result/', verticals=None, texts=
         #             cv2.putText(img, "{}".format(texts[i]), (poly[0][0]+1, poly[0][1]+1), font, font_scale, (0, 0, 0), thickness=1)
         #             cv2.putText(img, "{}".format(texts[i]), tuple(poly[0]), font, font_scale, (0, 255, 255), thickness=1)
         #
-        # #Save result image
-        # cv2.imwrite(res_img_file, img)
+        # with open(gt_file, 'r') as f: 
+        #     for line in f:
+        #         currentline = line.split(",")
+        #         start_point = (int(currentline[0]), int(currentline[1]))
+        #         end_point = (int(currentline[4]), int(currentline[5]))
+        #         color = (255, 128, 128)
+        #         thickness = 2
+        #         img = cv2.rectangle(img, start_point, end_point, color, thickness)
+         #Save result image
+        cv2.imwrite(res_img_file, img)
 

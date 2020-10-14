@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# script.py
 # -*- coding: utf-8 -*-
 from collections import namedtuple
 from eval import rrc_evaluation_funcs
@@ -333,7 +334,7 @@ def eval_2015(res_folder):
     params = {}
     current_folder = os.path.join(os.path.dirname(__file__))
     submitfile = os.path.join(current_folder, 'submit.zip')
-    #print(submitfile)
+    print(submitfile)
     filenames = os.listdir(res_folder)
     zip = zipfile.ZipFile(submitfile, "w", zipfile.ZIP_DEFLATED)
     for filename in filenames:
@@ -349,4 +350,4 @@ def eval_2015(res_folder):
 def getresult():
     # rrc_evaluation_funcs.main_evaluation(None, default_evaluation_params, validate_data, evaluate_method)
     #eval_2015('../../test')
-    eval_2015('/data/CRAFT-pytorch/result')
+    eval_2015('/home/peichen/git/CRAFT-Reimplementation/result_seg') #!modified path

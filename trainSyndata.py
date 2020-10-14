@@ -22,9 +22,9 @@ from math import exp
 from data_loader import ICDAR2015, Synth80k, ICDAR2013
 
 ###import file#######
-from augmentation import random_rot, crop_img_bboxes
-from gaussianmap import gaussion_transform, four_point_transform
-from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
+#! from augmentation import random_rot, crop_img_bboxes
+#! from gaussianmap import gaussion_transform, four_point_transform
+#! from generateheatmap import add_character, generate_target, add_affinity, generate_affinity, sort_box, real_affinity, generate_affinity_box
 from mseloss import Maploss
 
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     # imgtxt = box['txt'][0]
 
     #dataloader = syndata(imgname, charbox, imgtxt)
-    dataloader = Synth80k('/data/CRAFT-pytorch/syntext/SynthText/SynthText', target_size = 768)
+    dataloader = Synth80k('/syntext/SynthText/SynthText', target_size = 768) #! modified path
     train_loader = torch.utils.data.DataLoader(
         dataloader,
         batch_size=16,
@@ -113,10 +113,10 @@ if __name__ == '__main__':
         num_workers=0,
         drop_last=True,
         pin_memory=True)
-    #batch_syn = iter(train_loader)
+    # batch_syn = iter(train_loader)
     # prefetcher = data_prefetcher(dataloader)
     # input, target1, target2 = prefetcher.next()
-    #print(input.size())
+    # print(input.size())
     net = CRAFT()
     #net.load_state_dict(copyStateDict(torch.load('/data/CRAFT-pytorch/CRAFT_net_050000.pth')))
     #net.load_state_dict(copyStateDict(torch.load('/data/CRAFT-pytorch/1-7.pth')))
@@ -217,8 +217,8 @@ if __name__ == '__main__':
             if index % 5000 == 0 and index != 0:
                 print('Saving state, index:', index)
                 torch.save(net.module.state_dict(),
-                           '/data/CRAFT-pytorch/synweights/synweights_' + repr(index) + '.pth')
-                test('/data/CRAFT-pytorch/synweights/synweights_' + repr(index) + '.pth')
+                           '/realweight' + repr(index) + '.pth') #! modified path
+                test('/realweight' + repr(index) + '.pth') #! modified path
                 #test('/data/CRAFT-pytorch/craft_mlt_25k.pth')
                 getresult()
 

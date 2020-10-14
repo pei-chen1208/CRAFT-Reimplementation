@@ -1,8 +1,8 @@
-"""  
+"""
 Copyright (c) 2019-present NAVER Corp.
 MIT License
 """
-
+# This is test.py
 # -*- coding: utf-8 -*-
 import sys
 import os
@@ -58,9 +58,9 @@ args = parser.parse_args()
 
 
 """ For test images in a folder """
-image_list, _, _ = file_utils.get_files('/data/CRAFT-pytorch/test')
+image_list, _, _ = file_utils.get_files('test/real_img')  #! modified path
 
-result_folder = '/data/CRAFT-pytorch/result/'
+result_folder = './result_seg' #!modified path
 if not os.path.isdir(result_folder):
     os.mkdir(result_folder)
 
@@ -103,7 +103,6 @@ def test_net(net, image, text_threshold, link_threshold, low_text, cuda, poly):
     render_img = score_text.copy()
     render_img = np.hstack((render_img, score_link))
     ret_score_text = imgproc.cvt2HeatmapImg(render_img)
-
     if args.show_time : print("\ninfer/postproc time : {:.3f}/{:.3f}".format(t0, t1))
 
     return boxes, polys, ret_score_text
@@ -125,7 +124,7 @@ def test(modelpara):
         net = torch.nn.DataParallel(net)
         cudnn.benchmark = False
 
-    net.eval()
+    net.eval()    #stop update the weight of the neuron
 
     t = time.time()
 
@@ -135,11 +134,12 @@ def test(modelpara):
         image = imgproc.loadImage(image_path)
 
         bboxes, polys, score_text = test_net(net, image, args.text_threshold, args.link_threshold, args.low_text, args.cuda, args.poly)
+        print("\n bboxes = ", bboxes, "\n poly = ", polys, "\n text = ", score_text, "\n text.shape = ", score_text.shape)
         # save score text
         filename, file_ext = os.path.splitext(os.path.basename(image_path))
         mask_file = result_folder + "/res_" + filename + '_mask.jpg'
         #cv2.imwrite(mask_file, score_text)
-
+        print("save in" + result_folder)
         file_utils.saveResult(image_path, image[:,:,::-1], polys, dirname=result_folder)
 
     print("elapsed time : {}s".format(time.time() - t))

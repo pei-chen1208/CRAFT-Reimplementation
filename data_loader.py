@@ -535,8 +535,8 @@ class ICDAR2015(craft_base_dataset):
         super(ICDAR2015, self).__init__(target_size, viz, debug)
         self.net = net
         self.net.eval()
-        self.img_folder = os.path.join(icdar2015_folder, 'ch4_training_images')
-        self.gt_folder = os.path.join(icdar2015_folder, 'ch4_training_localization_transcription_gt')
+        self.img_folder = os.path.join(icdar2015_folder, 'pics')  #!modified: 'ch4_training_images'
+        self.gt_folder = os.path.join(icdar2015_folder, 'ground_truth_seg')  #!modified: gt_folder: 'ch4_training_localization_transcription_gt'
         imagenames = os.listdir(self.img_folder)
         self.images_path = []
         for imagename in imagenames:
@@ -591,6 +591,7 @@ class ICDAR2015(craft_base_dataset):
         return image, character_bboxes, new_words, confidence_mask, confidences
 
     def load_gt(self, gt_path):
+        #(gt_path)
         lines = open(gt_path, encoding='utf-8').readlines()
         bboxes = []
         words = []
