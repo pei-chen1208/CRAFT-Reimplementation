@@ -41,6 +41,9 @@ from craft import CRAFT
 from torch.autograd import Variable
 from multiprocessing import Pool
 
+def str2bool(v):
+    return v.lower() in ("yes", "y", "true", "t", "1")
+
 #3.2768e-5
 random.seed(42)
 
@@ -49,33 +52,6 @@ random.seed(42)
 #         pass
 #     def __call__(self, gt):
 #         image_name = gt['imnames'][0]
-parser = argparse.ArgumentParser(description='CRAFT reimplementation')
-
-
-parser.add_argument('--resume', default=None, type=str,
-                    help='Checkpoint state_dict file to resume training from')
-parser.add_argument('--batch_size', default=128, type = int,
-                    help='batch size of training')
-#parser.add_argument('--cdua', default=True, type=str2bool,
-                    #help='Use CUDA to train model')
-parser.add_argument('--lr', '--learning-rate', default=3.2768e-5, type=float,
-                    help='initial learning rate')
-parser.add_argument('--momentum', default=0.9, type=float,
-                    help='Momentum value for optim')
-parser.add_argument('--weight_decay', default=5e-4, type=float,
-                    help='Weight decay for SGD')
-parser.add_argument('--gamma', default=0.1, type=float,
-                    help='Gamma update for SGD')
-parser.add_argument('--num_workers', default=32, type=int,
-                    help='Number of workers used in dataloading')
-
-
-args = parser.parse_args()
-
-
-
-
-
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -101,7 +77,28 @@ def adjust_learning_rate(optimizer, gamma, step):
 
 
 if __name__ == '__main__':
+ 
+    parser = argparse.ArgumentParser(description='CRAFT reimplementation')
 
+    parser.add_argument('--resume', default=None, type=str,
+                        help='Checkpoint state_dict file to resume training from')
+    parser.add_argument('--batch_size', default=128, type = int,
+                        help='batch size of training')
+    parser.add_argument('--cuda', default=False, type=str2bool,
+                        help='Use CUDA to train model')
+    parser.add_argument('--lr', '--learning-rate', default=3.2768e-5, type=float,
+                        help='initial learning rate')
+    parser.add_argument('--momentum', default=0.9, type=float,
+                        help='Momentum value for optim')
+    parser.add_argument('--weight_decay', default=5e-4, type=float,
+                        help='Weight decay for SGD')
+    parser.add_argument('--gamma', default=0.1, type=float,
+                        help='Gamma update for SGD')
+    parser.add_argument('--num_workers', default=32, type=int,
+                        help='Number of workers used in dataloading')
+
+
+    args = parser.parse_args()
     # dataloader = Synth80k('/data/CRAFT-pytorch/syntext/SynthText/SynthText', target_size = 768)
     # train_loader = torch.utils.data.DataLoader(
     #     dataloader,
@@ -116,12 +113,13 @@ if __name__ == '__main__':
 
     net.load_state_dict(copyStateDict(torch.load('CRAFT_8011.pth')))
 
-    net = net.cuda()
-
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    net = net.to(device)
+    # net = net.cuda()
 
 
     net = torch.nn.DataParallel(net,device_ids=[0, 1]).cuda()
-    #net = torch.nn.DataParallel(net,device_ids=[1]).cuda()
+    #oet = torch.nn.DataParallel(net,device_ids=[1]).cuda()
     cudnn.benchmark = True
     net.train()
     realdata = ICDAR2015(net, 'icdar2015', target_size=768)
@@ -202,8 +200,8 @@ if __name__ == '__main__':
 
         print('Saving state, iter:', epoch)
         torch.save(net.module.state_dict(),
-                   './real_weights_false/CRAFT_clr_' + repr(epoch) + '.pth', _use_new_zipfile_serialization = False)   #! modified saving directory
-        test('./real_weights_false/CRAFT_clr_' + repr(epoch) + '.pth')         #! modified saving directory
+                   './real_weights_bit/CRAFT_clr_' + repr(epoch) + '.pth', _use_new_zipfile_serialization = False)   #! modified saving directory
+        test('./real_weights_bit/CRAFT_clr_' + repr(epoch) + '.pth')         #! modified saving directory
         #test('/data/CRAFT-pytorch/craft_mlt_25k.pth')
         getresult()
         evaluationParams = default_evaluation_params() 
