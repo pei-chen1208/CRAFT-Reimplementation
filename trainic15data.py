@@ -111,10 +111,11 @@ if __name__ == '__main__':
 
     net = CRAFT()
 
-    net.load_state_dict(copyStateDict(torch.load('CRAFT_8011.pth')))
+    device = torch.device("cuda:0" if torch.cuda.is_available() and args.cuda else "cpu")
+    # net.load_state_dict(copyStateDict(torch.load('CRAFT_8011.pth')))
+    net.load_state_dict(torch.load('CRAFT_8011.pth', map_location=device))
+    # net = net.to(device)
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    net = net.to(device)
     # net = net.cuda()
 
 
