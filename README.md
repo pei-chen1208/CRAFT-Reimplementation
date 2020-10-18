@@ -24,10 +24,10 @@ Syndata+IC15:[Syndata+IC15 for baidu drive](https://pan.baidu.com/s/19lJRM6YWZXV
 ## Train for your own data:
 - Put the training img and its ground truth in the "icdar2015" folder
 - Put the testing img and its ground truth ing the "test" folder
-- Change the path in basenet/vgg16_bn.py file: 
+- Change the path in basenet/vgg16_bn.py file:                                                                                                                          
 -> `(/data/CRAFT-pytorch/vgg16_bn-6c64b313.pth -> /your_path/vgg16_bn-6c64b313.pth).You can download the model here.`[baidu](https://pan.baidu.com/s/1_h5qdwYQAToDi_BB5Eg3vg)||[google](https://drive.google.com/open?id=1ZtvGpFQrbmEisB_GhmZb8UQOtvqY_-tW)
 
-- change the path in trainic15data.py file:                                                                                                                         
+- Change the path in trainic15data.py file:                                                                                                                         
 -> `(1、/data/CRAFT-pytorch/SynthText -> /your_path/SynthText)`                                                                                                                         
 -> `(2、/data/CRAFT-pytorch/real_weights -> /your_path/real_weights)`                                                                                                                         
 -> `(3、/data/CRAFT-pytorch/1-7.pth -> /your_path/your_pre-trained_model_name)`                                                                                                                         
