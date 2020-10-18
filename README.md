@@ -15,13 +15,13 @@ The full paper is available at: https://arxiv.org/pdf/1904.01941.pdf
 4、check requiremtns.txt                                                                                                      
 5、4 nvidia GPUs(we use 4 nvidia titanX)                                                                                      
 
-## pre-trained model:
+## Pre-trained model:
 `NOTE: There are old pre-trained models, I will upload the new results pre-trained models' link.`
 
 Syndata+IC15:[Syndata+IC15 for baidu drive](https://pan.baidu.com/s/19lJRM6YWZXVkZ_aytsYSiQ) ||      [Syndata+IC15 for google
  drive](https://drive.google.com/file/d/1k17GuBG_omT91tJoIMSlLrorYbLXkq4z/view?usp=sharing)                                   
 
-### Train for your own data:
+## Train for your own data:
 - Put the training img and its ground truth in the "icdar2015" folder
 - Put the testing img and its ground truth ing the "test" folder
 - Change the path in basenet/vgg16_bn.py file: 
@@ -34,7 +34,7 @@ Syndata+IC15:[Syndata+IC15 for baidu drive](https://pan.baidu.com/s/19lJRM6YWZXV
 -> `(4、/data/CRAFT-pytorch/icdar1317 -> /your_ic15data_path/)`
 - Run **`python trainic15data.py`**
 
-### We have released the latest code with new gaussian map and random crop algorithm. 
+## We have released the latest code with new gaussian map and random crop algorithm. 
 **`Note:new gaussian map method can split the inference gaussian region score map`**                                                                                                                         
 `Sample:`                                                                                           
 <img src="https://github.com/backtime92/CRAFT-Reimplementation/blob/master/image/test3_score.jpg" width="384" height="512" /><img src="https://github.com/backtime92/CRAFT-Reimplementation/blob/master/image/test3_affinity.jpg" width="384" height="256" />             
