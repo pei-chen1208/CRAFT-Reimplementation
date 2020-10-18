@@ -28,10 +28,10 @@ Syndata+IC15:[Syndata+IC15 for baidu drive](https://pan.baidu.com/s/19lJRM6YWZXV
 -> `(/data/CRAFT-pytorch/vgg16_bn-6c64b313.pth -> /your_path/vgg16_bn-6c64b313.pth).You can download the model here.`[baidu](https://pan.baidu.com/s/1_h5qdwYQAToDi_BB5Eg3vg)||[google](https://drive.google.com/open?id=1ZtvGpFQrbmEisB_GhmZb8UQOtvqY_-tW)
 
 - change the path in trainic15data.py file: 
-->` (1、/data/CRAFT-pytorch/SynthText -> /your_path/SynthText)`
-->` (2、/data/CRAFT-pytorch/real_weights -> /your_path/real_weights)`
--> `(3、/data/CRAFT-pytorch/1-7.pth -> /your_path/your_pre-trained_model_name)`
--> `(4、/data/CRAFT-pytorch/icdar1317 -> /your_ic15data_path/)`
+--` (1、/data/CRAFT-pytorch/SynthText -> /your_path/SynthText)`\n
+--` (2、/data/CRAFT-pytorch/real_weights -> /your_path/real_weights)`
+-- `(3、/data/CRAFT-pytorch/1-7.pth -> /your_path/your_pre-trained_model_name)`
+-- `(4、/data/CRAFT-pytorch/icdar1317 -> /your_ic15data_path/)`
 - Run **`python trainic15data.py`**
 
 ## We have released the latest code with new gaussian map and random crop algorithm. 
